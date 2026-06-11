@@ -30,6 +30,8 @@ button:active{filter:brightness(1.2)}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .bar{animation:grow .6s ease both}
+.blurred{filter:blur(7px);pointer-events:none;user-select:none}
+@keyframes priceFlash{0%,100%{text-shadow:0 0 12px #00D4FF,0 0 30px rgba(0,212,255,.6)}50%{text-shadow:0 0 24px #00D4FF,0 0 60px rgba(0,212,255,.9)}}
 @media(max-width:768px){
 .grid5{grid-template-columns:1fr 1fr}
 .grid3{grid-template-columns:1fr}
@@ -51,7 +53,10 @@ const C={bg:"#02060a",bg2:"#061320",bg3:"#0a1a24",panel:"#07131c",border:"#11293
 const glow=(c=C.cyan,s=12)=>`0 0 ${s}px ${c}, 0 0 ${s*2}px rgba(0,212,255,0.15)`;
 const RATIO_THRESHOLD=25;   // coal/paddy % above this = inefficient/non-compliant
 const TEMP_THRESHOLD=180;
-const WHATSAPP="917988474991";   // boiler stack temp °C above this = SPCB alert
+const WHATSAPP="917988474991";
+const TRIAL_DAYS=7;
+const CODES=["MILL-4999","GROUP-49999","ENT-200K"];
+const GOD_CODE="RAJ-SOVEREIGN-01";   // boiler stack temp °C above this = SPCB alert
 const MODULES=[{id:"dashboard",label:"DASHBOARD",icon:"▣"},{id:"log",label:"DAILY LOG",icon:"▤"},{id:"compliance",label:"COMPLIANCE",icon:"▧"},{id:"config",label:"CONFIG",icon:"⚙"}];
 
 function useIsMobile(){const[m,setM]=useState(false);useEffect(()=>{const c=()=>setM(window.innerWidth<768);c();window.addEventListener("resize",c);return()=>window.removeEventListener("resize",c)},[]);return m}
@@ -183,8 +188,8 @@ return(<div className="grid2">
 <div style={{marginTop:14,fontSize:10,color:C.dim,lineHeight:1.6}}>These defaults follow common State Pollution Control Board norms for rice mills. Adjust to your consent conditions.</div>
 <div style={{marginTop:16,padding:12,background:C.bg3,border:`1px solid ${C.border2}`}}>
 <div style={{fontSize:11,color:C.cyan,fontWeight:700,marginBottom:10}}>PLANS</div>
-{[["SINGLE MILL","₹4,999/yr"],["MILL GROUP","₹49,999/yr"],["ENTERPRISE","₹2,00,000/yr"]].map((p,i)=>(<div key={i} style={{display:"flex",justifyContent:"space-between",fontSize:11,padding:"5px 0",borderBottom:i<2?`1px solid ${C.border}`:"none"}}><span style={{color:C.text}}>{p[0]}</span><span style={{color:C.cyan,fontWeight:700}}>{p[1]}</span></div>))}
-<a href={`https://wa.me/${WHATSAPP}?text=Hi, I want Inspector for my mill. Please share details.`} target="_blank" style={{display:"block",textAlign:"center",background:C.cyan,color:"#000",fontWeight:700,fontSize:11,letterSpacing:1,padding:"10px",marginTop:12,textDecoration:"none",boxShadow:glow(C.cyan,5)}}>TALK TO SALES →</a></div></Panel></div>)}
+{[["SINGLE MILL","\u20B94,999/yr"],["MILL GROUP","\u20B949,999/yr"],["ENTERPRISE","\u20B92,00,000/yr"]].map((p,i)=>(<div key={i} style={{display:"flex",justifyContent:"space-between",fontSize:11,padding:"5px 0",borderBottom:i<2?`1px solid ${C.border}`:"none"}}><span style={{color:C.text}}>{p[0]}</span><span style={{color:C.cyan,fontWeight:700}}>{p[1]}</span></div>))}
+<a href={`https://wa.me/${WHATSAPP}?text=Hi, I want Inspector for my mill. Please share details.`} target="_blank" style={{display:"block",textAlign:"center",background:C.cyan,color:"#000",fontWeight:700,fontSize:11,letterSpacing:1,padding:"10px",marginTop:12,textDecoration:"none",boxShadow:glow(C.cyan,5)}}>TALK TO SALES \u2192</a></div></Panel></div>)}
 
 function EntryModal({onClose,onSave,isMobile}){
 const[date,setDate]=useState(new Date().toISOString().split("T")[0]);
@@ -272,10 +277,38 @@ function TrialBanner({daysLeft}){
 return(<div style={{background:"rgba(0,212,255,0.06)",borderBottom:`1px solid ${C.border}`,padding:"6px 12px",textAlign:"center",fontSize:10,letterSpacing:1,color:C.label}}>
 FREE TRIAL · <span style={{color:C.cyan,fontWeight:700}}>{daysLeft} DAY{daysLeft!==1?"S":""} LEFT</span> · <a href={CONTACT_WA} target="_blank" rel="noopener" style={{color:C.cyan,textDecoration:"underline"}}>REQUEST PRICING</a></div>)}
 
+function Paywall({onUnlock}){
+const[code,setCode]=useState("");
+const[err,setErr]=useState(false);
+const tryCode=()=>{const cc=code.trim().toUpperCase();
+if(CODES.includes(cc)||cc===GOD_CODE){localStorage.setItem("insp_pro","1");onUnlock()}
+else{setErr(true);setTimeout(()=>setErr(false),2000)}};
+return(<div style={{position:"fixed",inset:0,background:"rgba(2,6,10,0.6)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:2000,backdropFilter:"blur(2px)",padding:16,overflow:"auto"}}>
+<div className="modal-in" style={{background:"#000",border:`1px solid ${C.cyan}`,boxShadow:glow(C.cyan,24),width:440,maxWidth:"100%",textAlign:"center",padding:"36px 28px"}}>
+<div style={{fontSize:10,color:C.label,letterSpacing:3,marginBottom:8}}>YOUR {TRIAL_DAYS}-DAY TRIAL HAS ENDED</div>
+<div style={{fontSize:20,fontWeight:800,color:"#fff",letterSpacing:1,marginBottom:24}}>UNLOCK COMPLIANCE VAULT</div>
+<div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+{[["SINGLE MILL","\u20B94,999","/year","1 mill \u00B7 full vault"],["MILL GROUP","\u20B949,999","/year","up to 15 mills"],["ENTERPRISE","\u20B92,00,000","/year","unlimited \u00B7 priority support"]].map((p,i)=>(
+<a key={i} href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi, I want Inspector "+p[0]+" plan ("+p[1]+p[2]+"). Please share payment details.")}`} target="_blank" style={{textDecoration:"none",background:C.bg3,border:`1px solid ${i===0?C.cyan:C.border2}`,padding:"14px",display:"block",position:"relative"}}>
+{i===0&&<div style={{position:"absolute",top:-9,right:12,background:C.cyan,color:"#000",fontSize:8,fontWeight:800,letterSpacing:1,padding:"2px 8px"}}>MOST POPULAR</div>}
+<div style={{fontSize:10,color:C.label,letterSpacing:2,marginBottom:4}}>{p[0]}</div>
+<div style={{fontSize:24,fontWeight:800,color:C.cyan,animation:"priceFlash 1.6s ease-in-out infinite"}}>{p[1]}<span style={{fontSize:11,color:C.label}}>{p[2]}</span></div>
+<div style={{fontSize:9,color:C.dim,letterSpacing:1,marginTop:4}}>{p[3].toUpperCase()}</div></a>))}</div>
+<div style={{fontSize:9,color:C.dim,letterSpacing:1,marginBottom:14,lineHeight:1.6}}>PAY VIA WHATSAPP \u00B7 UNLOCK CODE SENT IMMEDIATELY AFTER PAYMENT</div>
+<div style={{display:"flex",gap:8,marginBottom:8}}>
+<input placeholder="HAVE A CODE? ENTER IT" value={code} onChange={e=>setCode(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryCode()} style={{...input,textAlign:"center",letterSpacing:2,borderColor:err?C.red:C.border2}}/>
+<button onClick={tryCode} style={{...btnPrimary,whiteSpace:"nowrap"}}>UNLOCK</button></div>
+{err&&<div style={{fontSize:10,color:C.red}}>INVALID CODE \u2014 CHECK AND TRY AGAIN</div>}
+</div></div>)}
+
 function INSPECTOR(){
 const[active,setActive]=useState("dashboard");
 const[showE,setShowE]=useState(false);
 const[entries,setEntries]=useState(()=>{try{return JSON.parse(localStorage.getItem("insp_entries")||"[]")}catch(e){return[]}});
+const[pro,setPro]=useState(()=>localStorage.getItem("insp_pro")==="1");
+const trialStart=useMemo(()=>{let s=localStorage.getItem("insp_start");if(!s){s=String(Date.now());localStorage.setItem("insp_start",s)}return Number(s)},[]);
+const daysUsed=Math.floor((Date.now()-trialStart)/(24*60*60*1000));
+const walled=!pro&&daysUsed>=TRIAL_DAYS;
 useEffect(()=>{localStorage.setItem("insp_entries",JSON.stringify(entries))},[entries]);
 const[mill,setMill]=useState("");
 const isMobile=useIsMobile();
@@ -291,22 +324,22 @@ const NavBtn=({m})=>(<button onClick={()=>setActive(m.id)} style={{display:"flex
 return(<div style={{background:C.bg,color:C.text,minHeight:"100vh",fontSize:12}}>
 <StatusBar mill={mill}/>
 <Ticker/>
-{!pw.unlocked&&!pw.locked&&<TrialBanner daysLeft={pw.daysLeft}/>}
+
 {isMobile&&<div style={{display:"flex",overflowX:"auto",background:"#000",borderBottom:`1px solid ${C.border}`,WebkitOverflowScrolling:"touch"}}>{MODULES.map(m=><NavBtn key={m.id} m={m}/>)}</div>}
 <div style={{display:"flex",minHeight:"calc(100vh - 70px)"}}>
 {!isMobile&&<div style={{width:180,background:"#000",borderRight:`1px solid ${C.border}`,padding:"12px 0",flexShrink:0}}>
 {MODULES.map(m=><NavBtn key={m.id} m={m}/>)}
 <div style={{padding:"16px",marginTop:20,borderTop:`1px solid ${C.border}`}}>
 <div style={{fontSize:9,color:C.dim,letterSpacing:1,marginBottom:6}}>COMPLIANCE VAULT</div>
-<div style={{fontSize:13,color:C.cyan,fontWeight:700,textShadow:glow(C.cyan,4)}}>FROM ₹4,999/yr</div>
-<div style={{fontSize:9,color:C.green,marginTop:4}}>● SPCB Ready</div></div></div>}
-<div style={{flex:1,padding:12,overflow:"hidden",minWidth:0}}>
+<div style={{fontSize:13,color:C.cyan,fontWeight:700,textShadow:glow(C.cyan,4)}}>{pro?"PRO ACTIVE":"FROM \u20B94,999/yr"}</div>
+<div style={{fontSize:9,color:pro?C.green:C.yellow,marginTop:4}}>{pro?"\u25CF Unlimited":`\u25CF Trial: ${Math.max(0,TRIAL_DAYS-daysUsed)} days left`}</div></div></div>}
+<div style={{flex:1,padding:12,overflow:"hidden",minWidth:0}} className={walled?"blurred":""}>
 <div style={{marginBottom:14}}>
 <h1 style={{fontSize:20,fontWeight:800,letterSpacing:1,color:"#fff",textShadow:glow(C.cyan,4)}}>{active==="dashboard"?"Inspector Shield":MODULES.find(m=>m.id===active).label}</h1>
 <div style={{fontSize:11,color:C.label,marginTop:4}}>Industrial Mill Compliance Vault · SPCB Monitoring</div></div>
 {render()}</div></div>
-{showE&&<EntryModal onClose={()=>setShowE(false)} onSave={add} isMobile={isMobile}/>}
-{pw.locked&&<Paywall tryUnlock={pw.tryUnlock}/>}</div>)}
+{walled&&<Paywall onUnlock={()=>setPro(true)}/>}
+{showE&&!walled&&<EntryModal onClose={()=>setShowE(false)} onSave={add} isMobile={isMobile}/>}</div>)}
 
 ReactDOM.createRoot(document.getElementById("root")).render(<INSPECTOR/>);
 </script>
@@ -364,4 +397,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(<INSPECTOR/>);
 </script>
 </body>
 </html>
+
 
