@@ -8,30 +8,32 @@
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#02060a;font-family:'IBM Plex Mono',monospace}
+body{background:#0A0A0C;font-family:'IBM Plex Mono',monospace;-webkit-font-smoothing:antialiased}
 @keyframes tk{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes modalIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes modalIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
 @keyframes grow{from{height:0}to{}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.panel-in{animation:fadeUp .35s ease both}
-.modal-in{animation:modalIn .2s ease both}
+@keyframes goldline{from{width:0}to{width:100%}}
+@keyframes ldr{0%{left:-40%}100%{left:100%}}
+.panel-in{animation:fadeUp .4s ease both}
+.modal-in{animation:modalIn .25s ease both}
 .row-hover{transition:background .15s}
-.row-hover:hover{background:#061320}
-input::placeholder{color:#3a5a6b}
-select option{background:#0a1a24;color:#fff}
-button:active{filter:brightness(1.2)}
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:#02060a}
-::-webkit-scrollbar-thumb{background:#1d3a4d}
-.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.bar{animation:grow .6s ease both}
-.blurred{filter:blur(7px);pointer-events:none;user-select:none}
-@keyframes priceFlash{0%,100%{text-shadow:0 0 12px #00D4FF,0 0 30px rgba(0,212,255,.6)}50%{text-shadow:0 0 24px #00D4FF,0 0 60px rgba(0,212,255,.9)}}
+.row-hover:hover{background:#101014}
+input::placeholder{color:#4a4a52}
+select option{background:#141418;color:#EDEDF0}
+button{transition:opacity .15s}
+button:active{opacity:.75}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#0A0A0C}
+::-webkit-scrollbar-thumb{background:#26262c}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.bar{animation:grow .7s cubic-bezier(.22,.8,.36,1) both}
+.blurred{filter:blur(8px);pointer-events:none;user-select:none}
+.goldline{animation:goldline .8s ease both}
 @media(max-width:768px){
 .grid5{grid-template-columns:1fr 1fr}
 .grid3{grid-template-columns:1fr}
@@ -41,79 +43,130 @@ button:active{filter:brightness(1.2)}
 </head>
 <body>
 <div id="root">
-  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#02060a;font-family:'IBM Plex Mono',monospace">
-    <div style="font-size:26px;font-weight:800;letter-spacing:4px;color:#fff;text-shadow:0 0 12px #00D4FF,0 0 24px rgba(0,212,255,.4)">INSPECTOR<span style="color:#00D4FF">·</span></div>
-    <div style="font-size:10px;color:#5a8499;letter-spacing:2px;margin-top:8px">POWERED BY <span style="color:#00D4FF">LEXCONV</span></div>
-    <div style="font-size:9px;color:#3a5a6b;letter-spacing:2px;margin-top:20px;animation:pulse 1.2s ease-in-out infinite">INITIALIZING COMPLIANCE VAULT...</div>
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0A0A0C;font-family:'IBM Plex Mono',monospace">
+    <div style="font-size:24px;font-weight:600;letter-spacing:6px;color:#EDEDF0">INSPECTOR<span style="color:#6B8FB3">·</span></div>
+    <div style="font-size:9px;color:#6a6a72;letter-spacing:3px;margin-top:10px">POWERED BY <span style="color:#6B8FB3">LEXCONV</span></div>
+    <div style="width:120px;height:1px;background:#1C1C20;margin-top:24px;position:relative;overflow:hidden"><div style="position:absolute;left:0;top:0;height:1px;width:40%;background:#6B8FB3;animation:ldr 1.2s ease-in-out infinite"></div></div>
   </div>
 </div>
 <script type="text/babel">
-const {useState,useEffect,useMemo}=React;
-const C={bg:"#02060a",bg2:"#061320",bg3:"#0a1a24",panel:"#07131c",border:"#11293a",border2:"#1d3a4d",cyan:"#00D4FF",cyanDim:"#0099b8",green:"#00FF9D",red:"#FF4D6D",yellow:"#FFD600",text:"#bfdfe8",dim:"#3a5a6b",label:"#5a8499"};
-const glow=(c=C.cyan,s=12)=>`0 0 ${s}px ${c}, 0 0 ${s*2}px rgba(0,212,255,0.15)`;
-const RATIO_THRESHOLD=25;   // coal/paddy % above this = inefficient/non-compliant
+const {useState,useEffect,useMemo,useRef}=React;
+
+// ═══ THEME · PRIVATE BANK (steel-blue accent) ═══════════════════
+const C={bg:"#0A0A0C",bg2:"#101014",bg3:"#141418",panel:"#0E0E11",
+border:"#1C1C20",border2:"#26262C",
+steel:"#6B8FB3",steelSoft:"#52708F",
+text:"#D8D8DC",white:"#EDEDF0",dim:"#4A4A52",label:"#7A7A82",
+ok:"#3E8E6B",warn:"#B8862D",bad:"#9E3B4D"};
+
+// ═══ BUSINESS CONFIG ════════════════════════════════════════════
+const RATIO_THRESHOLD=25;
 const TEMP_THRESHOLD=180;
 const WHATSAPP="917988474991";
 const TRIAL_DAYS=7;
 const CODES=["MILL-4999","GROUP-49999","ENT-200K"];
-const GOD_CODE="RAJ-SOVEREIGN-01";   // boiler stack temp °C above this = SPCB alert
-const MODULES=[{id:"dashboard",label:"DASHBOARD",icon:"▣"},{id:"log",label:"DAILY LOG",icon:"▤"},{id:"compliance",label:"COMPLIANCE",icon:"▧"},{id:"config",label:"CONFIG",icon:"⚙"}];
+const GOD_CODE="RAJ-SOVEREIGN-01";
+// ════════════════════════════════════════════════════════════════
+
+const MODULES=[{id:"dashboard",label:"DASHBOARD"},{id:"log",label:"DAILY LOG"},{id:"compliance",label:"COMPLIANCE"},{id:"config",label:"CONFIG"}];
+const ratioOf=e=>e.paddy>0?(e.coal/e.paddy*100):0;
+const isFlagged=e=>ratioOf(e)>RATIO_THRESHOLD||Number(e.temp)>TEMP_THRESHOLD;
 
 function useIsMobile(){const[m,setM]=useState(false);useEffect(()=>{const c=()=>setM(window.innerWidth<768);c();window.addEventListener("resize",c);return()=>window.removeEventListener("resize",c)},[]);return m}
 function useCountUp(t,dur=900){const[v,setV]=useState(0);useEffect(()=>{let raf,s;const tick=x=>{if(!s)s=x;const p=Math.min((x-s)/dur,1);setV(t*(1-Math.pow(1-p,3)));if(p<1)raf=requestAnimationFrame(tick)};raf=requestAnimationFrame(tick);return()=>cancelAnimationFrame(raf)},[t,dur]);return v}
 
-// compliance logic
-const ratioOf=e=>e.paddy>0?(e.coal/e.paddy*100):0;
-const isFlagged=e=>ratioOf(e)>RATIO_THRESHOLD||Number(e.temp)>TEMP_THRESHOLD;
+function Logo({onSecret}){
+const taps=useRef([]);
+const tap=()=>{const now=Date.now();taps.current=taps.current.filter(t=>now-t<2500);taps.current.push(now);
+if(taps.current.length>=5){taps.current=[];onSecret()}};
+return(<span onClick={tap} style={{fontSize:13,fontWeight:600,letterSpacing:3,color:C.white,whiteSpace:"nowrap",cursor:"default",userSelect:"none"}}>INSPECTOR<span style={{color:C.steel}}>·</span></span>)}
 
-function StatusBar({mill}){
+function StatusBar({pro,onSecret}){
 const[t,setT]=useState(null);
 useEffect(()=>{setT(new Date());const i=setInterval(()=>setT(new Date()),1000);return()=>clearInterval(i)},[]);
-return(<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",background:"#000",borderBottom:`1px solid ${C.cyan}`,boxShadow:glow(C.cyan,6),padding:"7px 12px",position:"sticky",top:0,zIndex:100}}>
-<div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
-<span style={{fontSize:14,fontWeight:800,letterSpacing:2,color:"#fff",textShadow:glow(C.cyan,8),whiteSpace:"nowrap"}}>INSPECTOR<span style={{color:C.cyan}}>·</span></span>
-<span style={{fontSize:8,color:C.label,whiteSpace:"nowrap"}}>by <span style={{color:C.cyan}}>LexConv</span></span></div>
-<div style={{display:"flex",alignItems:"center",gap:8}}>
-<span style={{fontSize:10,color:C.label,whiteSpace:"nowrap"}}>{mill||"YOUR MILL"}</span>
-<span style={{color:C.dim}}>|</span>
-<span style={{fontSize:12,color:C.cyan,fontWeight:600,letterSpacing:1,textShadow:glow(C.cyan,5)}}>{t?t.toLocaleTimeString("en-IN",{hour12:false}):"--:--:--"}</span></div></div>)}
+return(<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",background:"#070709",borderBottom:`1px solid ${C.border}`,padding:"9px 14px",position:"sticky",top:0,zIndex:100}}>
+<div style={{display:"flex",alignItems:"center",gap:10,minWidth:0}}>
+<Logo onSecret={onSecret}/>
+<span style={{fontSize:8,color:C.label,letterSpacing:1,whiteSpace:"nowrap"}}>by <span style={{color:C.steel}}>LexConv</span></span>
+{pro&&<span style={{fontSize:8,color:C.steel,border:`1px solid ${C.steelSoft}`,padding:"2px 7px",letterSpacing:2}}>PRO</span>}</div>
+<span style={{fontSize:12,color:C.text,fontWeight:500,letterSpacing:2}}>{t?t.toLocaleTimeString("en-IN",{hour12:false}):"--:--:--"}</span></div>)}
 
 function Ticker(){
-const items=[["SPCB","STACK TEMP ≤180°C"],["RATIO","COAL/PADDY ≤25%"],["CONSENT","RENEW ANNUALLY"],["EMISSION","PM ≤150mg/Nm³"],["RECORDS","KEEP 5 YEARS"],["AUDIT","SURPRISE CHECKS"]];
+const items=[["SPCB","STACK TEMP \u2264180\u00B0C"],["RATIO","COAL/PADDY \u226425%"],["CONSENT","RENEW ANNUALLY"],["EMISSION","PM \u2264150mg/Nm\u00B3"],["RECORDS","KEEP 5 YEARS"],["AUDIT","SURPRISE CHECKS"]];
 const all=[...items,...items];
-return(<div style={{background:"#000",borderBottom:`1px solid ${C.border}`,overflow:"hidden",whiteSpace:"nowrap",padding:"5px 0"}}>
-<div style={{display:"inline-flex",gap:30,animation:"tk 28s linear infinite"}}>
-{all.map((x,i)=><span key={i} style={{fontSize:10,letterSpacing:1,color:C.label}}>{x[0]} <span style={{color:C.cyan}}>{x[1]}</span></span>)}</div></div>)}
+return(<div style={{background:"#070709",borderBottom:`1px solid ${C.border}`,overflow:"hidden",whiteSpace:"nowrap",padding:"6px 0"}}>
+<div style={{display:"inline-flex",gap:38,animation:"tk 30s linear infinite"}}>
+{all.map((x,i)=><span key={i} style={{fontSize:9,letterSpacing:1.5,color:C.dim}}>{x[0]} <span style={{color:C.steelSoft}}>{x[1]}</span></span>)}</div></div>)}
 
 const Panel=({title,action,children,style})=>(<div className="panel-in" style={{background:C.panel,border:`1px solid ${C.border}`,...style}}>
-{title&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8,padding:"8px 12px",background:C.bg3,borderBottom:`1px solid ${C.border2}`,flexWrap:"wrap"}}>
-<span style={{fontSize:9,fontWeight:700,letterSpacing:1.5,color:C.cyan,textShadow:glow(C.cyan,4)}}>{title}</span>{action}</div>}
-<div style={{padding:12}}>{children}</div></div>);
+{title&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8,padding:"10px 14px",borderBottom:`1px solid ${C.border}`,flexWrap:"wrap"}}>
+<span style={{fontSize:9,fontWeight:500,letterSpacing:2.5,color:C.label}}>{title}</span>{action}</div>}
+<div style={{padding:14}}>{children}</div></div>);
 
 const Metric=({label,value,suffix="",delta,deltaColor,animate=true})=>{
 const num=typeof value==="number"?value:0;
 const a=useCountUp(animate?num:0);
 const disp=typeof value==="number"?Math.round(a).toLocaleString("en-IN")+suffix:value;
-return(<div className="panel-in" style={{background:C.panel,border:`1px solid ${C.border}`,padding:"12px 14px",position:"relative",overflow:"hidden"}}>
-<div style={{fontSize:9,color:C.label,letterSpacing:1,marginBottom:6}}>{label}</div>
-<div style={{fontSize:22,fontWeight:700,color:"#fff",lineHeight:1,textShadow:glow(C.cyan,6)}}>{disp}</div>
-{delta&&<div style={{fontSize:10,color:deltaColor||C.cyan,marginTop:5}}>{delta}</div>}
-<div style={{position:"absolute",bottom:0,left:0,height:2,width:"100%",background:`linear-gradient(90deg,${C.cyan},transparent)`,opacity:.5}}/></div>)};
+return(<div className="panel-in" style={{background:C.panel,border:`1px solid ${C.border}`,padding:"14px 16px",position:"relative",overflow:"hidden"}}>
+<div style={{fontSize:8,color:C.label,letterSpacing:2,marginBottom:8}}>{label}</div>
+<div style={{fontSize:21,fontWeight:500,color:C.white,lineHeight:1,letterSpacing:.5}}>{disp}</div>
+{delta&&<div style={{fontSize:9,color:deltaColor||C.label,marginTop:6,letterSpacing:.5}}>{delta}</div>}
+<div className="goldline" style={{position:"absolute",bottom:0,left:0,height:1,background:`linear-gradient(90deg,${C.steel} 0%,transparent 80%)`,opacity:.6}}/></div>)};
 
-const Empty=({msg,cta,onCta})=>(<div style={{padding:"40px 16px",textAlign:"center"}}>
-<div style={{fontSize:30,color:C.border2,marginBottom:12}}>◈</div>
-<div style={{fontSize:12,color:C.label,marginBottom:cta?16:0,lineHeight:1.5}}>{msg}</div>
+const Empty=({msg,cta,onCta})=>(<div style={{padding:"44px 16px",textAlign:"center"}}>
+<div style={{width:32,height:1,background:C.border2,margin:"0 auto 16px"}}/>
+<div style={{fontSize:11,color:C.label,marginBottom:cta?18:0,lineHeight:1.6,letterSpacing:.5}}>{msg}</div>
 {cta&&<button onClick={onCta} style={btnPrimary}>{cta}</button>}</div>);
 
 const Scroll=({children})=><div style={{overflowX:"auto",WebkitOverflowScrolling:"touch"}}>{children}</div>;
 
 function BarChartLite({data,thr}){
 const max=Math.max(...data.map(d=>d.v),thr||1);
-return(<div style={{display:"flex",alignItems:"flex-end",gap:4,height:200,padding:"10px 0",position:"relative",borderBottom:`1px solid ${C.border2}`}}>
-{thr&&<div style={{position:"absolute",left:0,right:0,bottom:`${10+(thr/max)*180/200*100}%`,borderTop:`1px dashed ${C.red}`,zIndex:1}}><span style={{position:"absolute",right:0,top:-12,fontSize:8,color:C.red}}>LIMIT {thr}°</span></div>}
-{data.map((d,i)=>(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4,height:"100%",justifyContent:"flex-end"}}>
-<div className="bar" style={{width:"70%",height:`${(d.v/max)*100}%`,minHeight:d.v>0?3:0,background:d.flag?`linear-gradient(180deg,${C.red},#992233)`:`linear-gradient(180deg,${C.cyan},${C.cyanDim})`,boxShadow:d.v>0?glow(d.flag?C.red:C.cyan,4):"none",borderRadius:"2px 2px 0 0",animationDelay:`${i*40}ms`}}/>
-<span style={{fontSize:8,color:C.label,whiteSpace:"nowrap"}}>{d.label}</span></div>))}</div>)}
+return(<div style={{display:"flex",alignItems:"flex-end",gap:4,height:190,padding:"10px 0",position:"relative",borderBottom:`1px solid ${C.border}`}}>
+{thr&&<div style={{position:"absolute",left:0,right:0,bottom:`${(thr/max)*170/190*100}%`,borderTop:`1px dashed ${C.bad}`,zIndex:1}}><span style={{position:"absolute",right:0,top:-12,fontSize:8,color:C.bad,letterSpacing:1}}>LIMIT {thr}\u00B0</span></div>}
+{data.map((d,i)=>(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:5,height:"100%",justifyContent:"flex-end"}}>
+<div className="bar" style={{width:"62%",height:`${(d.v/max)*100}%`,minHeight:d.v>0?2:0,background:d.flag?`linear-gradient(180deg,${C.bad},#6e2936)`:`linear-gradient(180deg,${C.steel},${C.steelSoft})`,animationDelay:`${i*45}ms`}}/>
+<span style={{fontSize:8,color:C.dim,letterSpacing:.5,whiteSpace:"nowrap"}}>{d.label}</span></div>))}</div>)}
+
+function SecretEntry({onClose,onUnlock}){
+const[code,setCode]=useState("");
+const[err,setErr]=useState(false);
+const tryCode=()=>{const cc=code.trim().toUpperCase();
+if(CODES.includes(cc)||cc===GOD_CODE){localStorage.setItem("insp_pro","1");onUnlock();onClose()}
+else{setErr(true);setTimeout(()=>setErr(false),1800)}};
+return(<div style={{position:"fixed",inset:0,background:"rgba(7,7,9,.82)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:3000,padding:16}} onClick={onClose}>
+<div className="modal-in" onClick={e=>e.stopPropagation()} style={{background:C.bg,border:`1px solid ${C.steelSoft}`,width:340,maxWidth:"100%",padding:"28px 24px",textAlign:"center"}}>
+<div style={{fontSize:9,color:C.label,letterSpacing:3,marginBottom:18}}>ACCESS CODE</div>
+<input autoFocus placeholder="ENTER CODE" value={code} onChange={e=>setCode(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryCode()} style={{...input,textAlign:"center",letterSpacing:3,borderColor:err?C.bad:C.border2,marginBottom:12}}/>
+<button onClick={tryCode} style={{...btnPrimary,width:"100%"}}>AUTHORISE</button>
+{err&&<div style={{fontSize:9,color:C.bad,marginTop:10,letterSpacing:1}}>INVALID CODE</div>}
+</div></div>)}
+
+function Paywall({onUnlock}){
+const[code,setCode]=useState("");
+const[err,setErr]=useState(false);
+const tryCode=()=>{const cc=code.trim().toUpperCase();
+if(CODES.includes(cc)||cc===GOD_CODE){localStorage.setItem("insp_pro","1");onUnlock()}
+else{setErr(true);setTimeout(()=>setErr(false),1800)}};
+const tiers=[["SINGLE MILL","\u20B94,999","/year","1 mill \u00B7 full vault"],["MILL GROUP","\u20B949,999","/year","up to 15 mills"],["ENTERPRISE","\u20B92,00,000","/year","unlimited \u00B7 priority support"]];
+return(<div style={{position:"fixed",inset:0,background:"rgba(7,7,9,.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:2000,backdropFilter:"blur(2px)",padding:16,overflow:"auto"}}>
+<div className="modal-in" style={{background:C.bg,border:`1px solid ${C.steelSoft}`,width:440,maxWidth:"100%",textAlign:"center",padding:"40px 30px",position:"relative"}}>
+<div style={{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:60,height:1,background:C.steel}}/>
+<div style={{fontSize:9,color:C.label,letterSpacing:3,marginBottom:6}}>YOUR {TRIAL_DAYS}-DAY EVALUATION HAS CONCLUDED</div>
+<div style={{fontSize:19,fontWeight:600,color:C.white,letterSpacing:2,marginBottom:30}}>CONTINUE WITH INSPECTOR</div>
+<div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:24}}>
+{tiers.map((p,i)=>(
+<a key={i} href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi, I want Inspector "+p[0]+" plan ("+p[1]+p[2]+"). Please share payment details.")}`} target="_blank" style={{textDecoration:"none",background:C.bg2,border:`1px solid ${i===0?C.steelSoft:C.border2}`,padding:"16px",display:"block",position:"relative"}}>
+{i===0&&<div style={{position:"absolute",top:-8,right:14,background:C.steel,color:"#0A0A0C",fontSize:7,fontWeight:600,letterSpacing:1.5,padding:"3px 9px"}}>PREFERRED</div>}
+<div style={{fontSize:8,color:C.label,letterSpacing:2.5,marginBottom:5}}>{p[0]}</div>
+<div style={{fontSize:26,fontWeight:500,color:i===0?C.steel:C.white}}>{p[1]}<span style={{fontSize:11,color:C.label}}>{p[2]}</span></div>
+<div style={{fontSize:8,color:C.dim,letterSpacing:1.5,marginTop:5}}>{p[3].toUpperCase()}</div></a>))}</div>
+<div style={{fontSize:8,color:C.dim,letterSpacing:1.5,marginBottom:18,lineHeight:1.8}}>SELECT A PLAN \u00B7 PAY VIA WHATSAPP \u00B7 ACCESS CODE ISSUED IMMEDIATELY</div>
+<div style={{display:"flex",gap:8,marginBottom:10}}>
+<input placeholder="ACCESS CODE" value={code} onChange={e=>setCode(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryCode()} style={{...input,textAlign:"center",letterSpacing:3,borderColor:err?C.bad:C.border2}}/>
+<button onClick={tryCode} style={{...btnPrimary,whiteSpace:"nowrap"}}>ENTER</button></div>
+{err&&<div style={{fontSize:9,color:C.bad,letterSpacing:1}}>INVALID CODE</div>}
+</div></div>)}
 
 function Dashboard({entries,onLog}){
 const stats=useMemo(()=>{
@@ -125,71 +178,65 @@ const compliance=entries.length?Math.round((entries.length-alerts)/entries.lengt
 return{records:entries.length,paddy,avgTemp,alerts,compliance}},[entries]);
 const trend=useMemo(()=>entries.slice().reverse().slice(-12).map(e=>({label:e.date.slice(5),v:Number(e.temp),flag:isFlagged(e)})),[entries]);
 const ratio=useMemo(()=>{const p=entries.reduce((s,e)=>s+Number(e.paddy),0);const c=entries.reduce((s,e)=>s+Number(e.coal),0);return p>0?(c/p*100):0},[entries]);
-
-if(entries.length===0)return(<div style={{display:"flex",flexDirection:"column",gap:12}}>
+if(entries.length===0)return(<div style={{display:"flex",flexDirection:"column",gap:10}}>
 <div className="grid5">{["RECORDS","PADDY KG","AVG TEMP","ALERT DAYS","COMPLIANCE"].map(l=><Metric key={l} label={l} value={0}/>)}</div>
-<Panel title="▸ BOILER TEMP · TREND"><Empty msg="Chart appears after your first daily entry." cta="+ LOG TODAY'S DATA" onCta={onLog}/></Panel></div>);
-
-return(<div style={{display:"flex",flexDirection:"column",gap:12}}>
+<Panel title="BOILER TEMP \u00B7 TREND"><Empty msg="The chart appears after your first daily entry." cta="LOG TODAY'S DATA" onCta={onLog}/></Panel></div>);
+return(<div style={{display:"flex",flexDirection:"column",gap:10}}>
 <div className="grid5">
 <Metric label="RECORDS" value={stats.records}/>
 <Metric label="PADDY KG" value={stats.paddy}/>
-<Metric label="AVG BOILER TEMP" value={Math.round(stats.avgTemp)} suffix="°C" deltaColor={stats.avgTemp>TEMP_THRESHOLD?C.red:C.green} delta={stats.avgTemp>TEMP_THRESHOLD?"above limit":"within limit"}/>
-<Metric label="ALERT DAYS" value={stats.alerts} deltaColor={stats.alerts>0?C.red:C.green} delta={stats.alerts>0?"needs action":"all clear"}/>
-<Metric label="COMPLIANCE" value={stats.compliance} suffix="%" deltaColor={stats.compliance>=80?C.green:C.yellow}/></div>
-<Panel title="▸ BOILER STACK TEMP · TREND (°C)"><BarChartLite data={trend} thr={TEMP_THRESHOLD}/></Panel>
-<Panel title="▸ BOILER EFFICIENCY STATUS">
+<Metric label="AVG BOILER TEMP" value={Math.round(stats.avgTemp)} suffix="\u00B0C" deltaColor={stats.avgTemp>TEMP_THRESHOLD?C.bad:C.ok} delta={stats.avgTemp>TEMP_THRESHOLD?"above limit":"within limit"}/>
+<Metric label="ALERT DAYS" value={stats.alerts} deltaColor={stats.alerts>0?C.bad:C.ok} delta={stats.alerts>0?"needs action":"all clear"}/>
+<Metric label="COMPLIANCE" value={stats.compliance} suffix="%" deltaColor={stats.compliance>=80?C.ok:C.warn}/></div>
+<Panel title="BOILER STACK TEMP \u00B7 TREND (\u00B0C)"><BarChartLite data={trend} thr={TEMP_THRESHOLD}/></Panel>
+<Panel title="BOILER EFFICIENCY">
 <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
-<span style={{width:10,height:10,borderRadius:"50%",background:ratio>RATIO_THRESHOLD?C.red:C.green,boxShadow:glow(ratio>RATIO_THRESHOLD?C.red:C.green,5)}}/>
-<span style={{fontSize:14,fontWeight:700,color:ratio>RATIO_THRESHOLD?C.red:C.green}}>{ratio>RATIO_THRESHOLD?"INEFFICIENT · OVER THRESHOLD":"EFFICIENT · COMPLIANT"}</span></div>
-<div style={{fontSize:12,color:C.text}}>Coal/Paddy Ratio: <span style={{color:C.cyan,fontWeight:700}}>{ratio.toFixed(1)}%</span> <span style={{color:C.dim}}>(Threshold: {RATIO_THRESHOLD}%)</span></div></Panel></div>)}
+<span style={{width:8,height:8,borderRadius:"50%",background:ratio>RATIO_THRESHOLD?C.bad:C.ok}}/>
+<span style={{fontSize:12,fontWeight:500,letterSpacing:1,color:ratio>RATIO_THRESHOLD?C.bad:C.ok}}>{ratio>RATIO_THRESHOLD?"OVER THRESHOLD \u00B7 REVIEW REQUIRED":"EFFICIENT \u00B7 COMPLIANT"}</span></div>
+<div style={{fontSize:11,color:C.text}}>Coal/Paddy Ratio: <span style={{color:C.steel,fontWeight:500}}>{ratio.toFixed(1)}%</span> <span style={{color:C.dim}}>(threshold {RATIO_THRESHOLD}%)</span></div></Panel></div>)}
 
-function DailyLog({entries,onLog,onDelete}){
-return(<Panel title="▸ PROCUREMENT & BOILER LOG" action={<button onClick={onLog} style={btnPrimary}>+ NEW ENTRY</button>}>
-{entries.length===0?<Empty msg="No entries yet. Start by logging today's mill data." cta="+ LOG ENTRY" onCta={onLog}/>:
-<Scroll><table style={tbl}><thead><tr style={trHead}><th style={th}>DATE</th><th style={thR}>PADDY KG</th><th style={thR}>COAL KG</th><th style={thR}>RATIO</th><th style={thR}>TEMP °C</th><th style={thC}>STATUS</th></tr></thead><tbody>
+function DailyLog({entries,onLog}){
+return(<Panel title="PROCUREMENT & BOILER LOG" action={<button onClick={onLog} style={btnPrimary}>+ NEW ENTRY</button>}>
+{entries.length===0?<Empty msg="No entries on record. Begin with today's mill data." cta="LOG ENTRY" onCta={onLog}/>:
+<Scroll><table style={tbl}><thead><tr style={trHead}><th style={th}>DATE</th><th style={thR}>PADDY KG</th><th style={thR}>COAL KG</th><th style={thR}>RATIO</th><th style={thR}>TEMP \u00B0C</th><th style={thC}>STATUS</th></tr></thead><tbody>
 {entries.map(e=>{const r=ratioOf(e);const fl=isFlagged(e);return(<tr key={e.id} className="row-hover" style={{borderBottom:`1px solid ${C.border}`}}>
-<td style={{...td,color:C.cyan,whiteSpace:"nowrap"}}>{e.date}</td>
+<td style={{...td,color:C.steel,whiteSpace:"nowrap"}}>{e.date}</td>
 <td style={tdR}>{Number(e.paddy).toLocaleString("en-IN")}</td>
 <td style={tdR}>{Number(e.coal).toLocaleString("en-IN")}</td>
-<td style={{...tdR,color:r>RATIO_THRESHOLD?C.red:C.green}}>{r.toFixed(1)}%</td>
-<td style={{...tdR,color:Number(e.temp)>TEMP_THRESHOLD?C.red:C.text}}>{e.temp}</td>
-<td style={tdC}><span style={{fontSize:9,fontWeight:700,letterSpacing:1,color:fl?C.red:C.green,border:`1px solid ${fl?C.red:C.green}`,padding:"2px 6px"}}>{fl?"ALERT":"OK"}</span></td></tr>)})}</tbody></table></Scroll>}</Panel>)}
+<td style={{...tdR,color:r>RATIO_THRESHOLD?C.bad:C.ok}}>{r.toFixed(1)}%</td>
+<td style={{...tdR,color:Number(e.temp)>TEMP_THRESHOLD?C.bad:C.text}}>{e.temp}</td>
+<td style={tdC}><span style={{fontSize:8,fontWeight:500,letterSpacing:1.5,color:fl?C.bad:C.ok,border:`1px solid ${fl?C.bad:C.ok}55`,padding:"3px 8px"}}>{fl?"ALERT":"OK"}</span></td></tr>)})}</tbody></table></Scroll>}</Panel>)}
 
-function Compliance({entries,mill}){
+function Compliance({entries}){
 const alerts=entries.filter(isFlagged);
 const compliance=entries.length?Math.round((entries.length-alerts.length)/entries.length*100):0;
-return(<div style={{display:"flex",flexDirection:"column",gap:12}}>
+return(<div style={{display:"flex",flexDirection:"column",gap:10}}>
 <div className="grid3">
-<Metric label="COMPLIANCE SCORE" value={compliance} suffix="%" deltaColor={compliance>=80?C.green:C.yellow}/>
-<Metric label="TOTAL ALERTS" value={alerts.length} deltaColor={alerts.length>0?C.red:C.green}/>
+<Metric label="COMPLIANCE SCORE" value={compliance} suffix="%" deltaColor={compliance>=80?C.ok:C.warn}/>
+<Metric label="TOTAL ALERTS" value={alerts.length} deltaColor={alerts.length>0?C.bad:C.ok}/>
 <Metric label="RECORDS ON FILE" value={entries.length} delta="SPCB ready"/></div>
-<Panel title="▸ SPCB COMPLIANCE SUMMARY" action={entries.length?<button style={btnSm}>↓ EXPORT REPORT</button>:null}>
-{entries.length===0?<Empty msg="Compliance report builds from your daily logs."/>:
-<div style={{fontSize:12,color:C.text,lineHeight:1.9}}>
-<div style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${C.border}`}}><span>Stack Temp Limit</span><span style={{color:C.cyan}}>{TEMP_THRESHOLD}°C</span></div>
-<div style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${C.border}`}}><span>Coal/Paddy Limit</span><span style={{color:C.cyan}}>{RATIO_THRESHOLD}%</span></div>
-<div style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${C.border}`}}><span>Days Logged</span><span style={{color:C.cyan}}>{entries.length}</span></div>
-<div style={{display:"flex",justifyContent:"space-between",padding:"7px 0"}}><span>Non-Compliant Days</span><span style={{color:alerts.length?C.red:C.green}}>{alerts.length}</span></div>
-{alerts.length>0&&<div style={{marginTop:12,padding:10,background:"rgba(255,77,109,0.08)",border:`1px solid ${C.red}`,fontSize:11,color:C.red}}>⚠ {alerts.length} day(s) breached limits. Review boiler operation before next SPCB audit.</div>}</div>}</Panel></div>)}
+<Panel title="SPCB COMPLIANCE SUMMARY">
+{entries.length===0?<Empty msg="The compliance report builds from your daily logs."/>:
+<div style={{fontSize:11,color:C.text}}>
+{[["Stack Temp Limit",TEMP_THRESHOLD+"\u00B0C"],["Coal/Paddy Limit",RATIO_THRESHOLD+"%"],["Days Logged",entries.length],["Non-Compliant Days",alerts.length]].map((x,i)=>(
+<div key={i} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:i<3?`1px solid ${C.border}`:"none"}}><span style={{color:C.label}}>{x[0]}</span><span style={{color:i===3&&alerts.length>0?C.bad:C.steel}}>{x[1]}</span></div>))}
+{alerts.length>0&&<div style={{marginTop:14,padding:12,border:`1px solid ${C.bad}55`,fontSize:10,color:C.bad,letterSpacing:.5,lineHeight:1.7}}>{alerts.length} day(s) breached limits. Review boiler operation before the next SPCB audit.</div>}</div>}</Panel></div>)}
 
-function Config({mill,setMill}){
+function Config({mill,setMill,pro}){
 return(<div className="grid2">
-<Panel title="▸ MILL PROFILE">
-<div style={{marginBottom:12}}><div style={{fontSize:9,color:C.label,letterSpacing:1,marginBottom:4}}>MILL NAME</div>
+<Panel title="MILL PROFILE">
+<div style={{marginBottom:12}}><div style={{fontSize:8,color:C.label,letterSpacing:2,marginBottom:5}}>MILL NAME</div>
 <input value={mill} onChange={e=>setMill(e.target.value)} placeholder="e.g. Maa Tarini Rice Mill" style={input}/></div>
-<div style={{marginBottom:12}}><div style={{fontSize:9,color:C.label,letterSpacing:1,marginBottom:4}}>SPCB CONSENT NO</div><input placeholder="Consent to operate number" style={input}/></div>
-<div style={{marginBottom:12}}><div style={{fontSize:9,color:C.label,letterSpacing:1,marginBottom:4}}>DISTRICT</div><input placeholder="e.g. Kalahandi" style={input}/></div>
+<div style={{marginBottom:12}}><div style={{fontSize:8,color:C.label,letterSpacing:2,marginBottom:5}}>SPCB CONSENT NO</div><input placeholder="Consent to operate number" style={input}/></div>
+<div style={{marginBottom:12}}><div style={{fontSize:8,color:C.label,letterSpacing:2,marginBottom:5}}>DISTRICT</div><input placeholder="e.g. Kalahandi" style={input}/></div>
 <button style={btnPrimary}>SAVE PROFILE</button></Panel>
-<Panel title="▸ COMPLIANCE THRESHOLDS">
-<div style={{fontSize:12,color:C.text,lineHeight:2}}>
-<div style={{display:"flex",justifyContent:"space-between"}}><span>Boiler Stack Temp Limit</span><span style={{color:C.cyan,fontWeight:700}}>{TEMP_THRESHOLD}°C</span></div>
-<div style={{display:"flex",justifyContent:"space-between"}}><span>Coal/Paddy Ratio Limit</span><span style={{color:C.cyan,fontWeight:700}}>{RATIO_THRESHOLD}%</span></div></div>
-<div style={{marginTop:14,fontSize:10,color:C.dim,lineHeight:1.6}}>These defaults follow common State Pollution Control Board norms for rice mills. Adjust to your consent conditions.</div>
-<div style={{marginTop:16,padding:12,background:C.bg3,border:`1px solid ${C.border2}`}}>
-<div style={{fontSize:11,color:C.cyan,fontWeight:700,marginBottom:10}}>PLANS</div>
-{[["SINGLE MILL","\u20B94,999/yr"],["MILL GROUP","\u20B949,999/yr"],["ENTERPRISE","\u20B92,00,000/yr"]].map((p,i)=>(<div key={i} style={{display:"flex",justifyContent:"space-between",fontSize:11,padding:"5px 0",borderBottom:i<2?`1px solid ${C.border}`:"none"}}><span style={{color:C.text}}>{p[0]}</span><span style={{color:C.cyan,fontWeight:700}}>{p[1]}</span></div>))}
-<a href={`https://wa.me/${WHATSAPP}?text=Hi, I want Inspector for my mill. Please share details.`} target="_blank" style={{display:"block",textAlign:"center",background:C.cyan,color:"#000",fontWeight:700,fontSize:11,letterSpacing:1,padding:"10px",marginTop:12,textDecoration:"none",boxShadow:glow(C.cyan,5)}}>TALK TO SALES \u2192</a></div></Panel></div>)}
+<Panel title="MEMBERSHIP">
+{pro?(<div>
+<div style={{fontSize:12,color:C.steel,letterSpacing:2,marginBottom:10}}>PRO \u00B7 ACTIVE</div>
+<div style={{fontSize:11,color:C.text,lineHeight:1.9}}>Full vault \u00B7 unlimited records \u00B7 SPCB exports</div></div>):(<div>
+<div style={{fontSize:11,color:C.text,lineHeight:2}}>
+{[["SINGLE MILL","\u20B94,999/yr"],["MILL GROUP","\u20B949,999/yr"],["ENTERPRISE","\u20B92,00,000/yr"]].map((p,i)=>(<div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",borderBottom:i<2?`1px solid ${C.border}`:"none"}}><span style={{color:C.label}}>{p[0]}</span><span style={{color:C.steel}}>{p[1]}</span></div>))}</div>
+<a href={`https://wa.me/${WHATSAPP}?text=Hi, I want Inspector for my mill. Please share details.`} target="_blank" style={{...btnPrimary,display:"block",textAlign:"center",textDecoration:"none",marginTop:16}}>TALK TO SALES \u2192</a></div>)}</Panel></div>)}
 
 function EntryModal({onClose,onSave,isMobile}){
 const[date,setDate]=useState(new Date().toISOString().split("T")[0]);
@@ -199,203 +246,78 @@ const[temp,setTemp]=useState("");
 const ratio=paddy>0?(coal/paddy*100):0;
 const flag=ratio>RATIO_THRESHOLD||Number(temp)>TEMP_THRESHOLD;
 const save=()=>{if(!paddy||!coal||!temp){alert("Fill paddy, coal and boiler temp.");return}onSave({id:Date.now(),date,paddy:Number(paddy),coal:Number(coal),temp:Number(temp)});onClose()};
-return(<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.9)",display:"flex",alignItems:isMobile?"flex-start":"center",justifyContent:"center",zIndex:1000,backdropFilter:"blur(5px)",padding:isMobile?0:16,overflow:"auto"}}>
-<div className="modal-in" style={{background:C.bg,border:`1px solid ${C.cyan}`,boxShadow:glow(C.cyan,18),width:520,maxWidth:"100%",minHeight:isMobile?"100vh":"auto"}}>
-<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",background:C.cyan,color:"#000",position:"sticky",top:0}}>
-<span style={{fontWeight:800,letterSpacing:1.5,fontSize:13}}>NEW DAILY ENTRY</span>
-<button onClick={onClose} style={{background:"none",border:"none",fontSize:20,cursor:"pointer",color:"#000"}}>✕</button></div>
-<div style={{padding:16}}>
-<div style={{marginBottom:12}}><div style={{fontSize:9,color:C.label,letterSpacing:1,marginBottom:4}}>DATE</div><input type="date" value={date} onChange={e=>setDate(e.target.value)} style={input}/></div>
+return(<div style={{position:"fixed",inset:0,background:"rgba(7,7,9,.88)",display:"flex",alignItems:isMobile?"flex-start":"center",justifyContent:"center",zIndex:1000,backdropFilter:"blur(4px)",padding:isMobile?0:16,overflow:"auto"}}>
+<div className="modal-in" style={{background:C.bg,border:`1px solid ${C.steelSoft}`,width:500,maxWidth:"100%",minHeight:isMobile?"100vh":"auto"}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 18px",borderBottom:`1px solid ${C.border2}`,position:"sticky",top:0,background:C.bg}}>
+<span style={{fontWeight:600,letterSpacing:3,fontSize:11,color:C.steel}}>NEW DAILY ENTRY</span>
+<button onClick={onClose} style={{background:"none",border:"none",fontSize:18,cursor:"pointer",color:C.label}}>\u2715</button></div>
+<div style={{padding:18}}>
+<div style={{marginBottom:12}}><div style={{fontSize:8,color:C.label,letterSpacing:2,marginBottom:5}}>DATE</div><input type="date" value={date} onChange={e=>setDate(e.target.value)} style={input}/></div>
 <div className="grid2" style={{marginBottom:12}}>
-<div><div style={{fontSize:9,color:C.label,letterSpacing:1,marginBottom:4}}>PADDY PROCESSED (KG)</div><input type="number" placeholder="0" value={paddy} onChange={e=>setPaddy(e.target.value)} style={input}/></div>
-<div><div style={{fontSize:9,color:C.label,letterSpacing:1,marginBottom:4}}>COAL / FUEL USED (KG)</div><input type="number" placeholder="0" value={coal} onChange={e=>setCoal(e.target.value)} style={input}/></div></div>
-<div style={{marginBottom:14}}><div style={{fontSize:9,color:C.label,letterSpacing:1,marginBottom:4}}>BOILER STACK TEMP (°C)</div><input type="number" placeholder="0" value={temp} onChange={e=>setTemp(e.target.value)} style={input}/></div>
-<div style={{padding:14,background:C.panel,border:`1px solid ${flag?C.red:C.border}`}}>
-<div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.label,padding:"4px 0"}}><span>COAL/PADDY RATIO</span><span style={{color:ratio>RATIO_THRESHOLD?C.red:C.green,fontWeight:700}}>{ratio.toFixed(1)}%</span></div>
-<div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.label,padding:"4px 0"}}><span>STATUS</span><span style={{color:flag?C.red:C.green,fontWeight:700}}>{flag?"⚠ ALERT — REVIEW":"✓ COMPLIANT"}</span></div></div>
+<div><div style={{fontSize:8,color:C.label,letterSpacing:2,marginBottom:5}}>PADDY PROCESSED (KG)</div><input type="number" placeholder="0" value={paddy} onChange={e=>setPaddy(e.target.value)} style={input}/></div>
+<div><div style={{fontSize:8,color:C.label,letterSpacing:2,marginBottom:5}}>COAL / FUEL USED (KG)</div><input type="number" placeholder="0" value={coal} onChange={e=>setCoal(e.target.value)} style={input}/></div></div>
+<div style={{marginBottom:14}}><div style={{fontSize:8,color:C.label,letterSpacing:2,marginBottom:5}}>BOILER STACK TEMP (\u00B0C)</div><input type="number" placeholder="0" value={temp} onChange={e=>setTemp(e.target.value)} style={input}/></div>
+<div style={{padding:14,background:C.panel,border:`1px solid ${flag?C.bad+"55":C.border}`}}>
+<div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:C.label,padding:"4px 0",letterSpacing:1}}><span>COAL/PADDY RATIO</span><span style={{color:ratio>RATIO_THRESHOLD?C.bad:C.ok,fontWeight:500}}>{ratio.toFixed(1)}%</span></div>
+<div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:C.label,padding:"4px 0",letterSpacing:1}}><span>STATUS</span><span style={{color:flag?C.bad:C.ok,fontWeight:500}}>{flag?"ALERT \u2014 REVIEW":"COMPLIANT"}</span></div></div>
 <button onClick={save} style={{...btnPrimary,width:"100%",marginTop:16}}>SAVE ENTRY</button></div></div></div>)}
 
-const btnPrimary={background:C.cyan,color:"#000",border:"none",fontFamily:"inherit",fontWeight:700,fontSize:11,letterSpacing:1,padding:"9px 14px",cursor:"pointer",boxShadow:glow(C.cyan,5)};
-const btnSm={background:"none",border:`1px solid ${C.cyanDim}`,color:C.cyan,fontFamily:"inherit",fontSize:10,letterSpacing:1,padding:"4px 9px",cursor:"pointer"};
-const input={background:C.bg3,border:`1px solid ${C.border2}`,color:"#fff",fontFamily:"inherit",fontSize:14,padding:"9px 10px",outline:"none",width:"100%"};
+const btnPrimary={background:C.steel,color:"#0A0A0C",border:"none",fontFamily:"inherit",fontWeight:600,fontSize:10,letterSpacing:2,padding:"10px 16px",cursor:"pointer"};
+const chip={background:"none",border:`1px solid ${C.border2}`,color:C.label,fontFamily:"inherit",fontSize:9,letterSpacing:1.5,padding:"6px 12px",cursor:"pointer"};
+const input={background:C.bg3,border:`1px solid ${C.border2}`,color:C.white,fontFamily:"inherit",fontSize:13,padding:"10px 11px",outline:"none",width:"100%"};
 const tbl={width:"100%",borderCollapse:"collapse",fontSize:11,minWidth:440};
-const trHead={color:C.dim,fontSize:9,letterSpacing:1,textAlign:"left",borderBottom:`1px solid ${C.border2}`};
-const th={padding:"8px 6px",fontWeight:600};
+const trHead={color:C.dim,fontSize:8,letterSpacing:1.5,textAlign:"left",borderBottom:`1px solid ${C.border2}`};
+const th={padding:"9px 6px",fontWeight:500};
 const thR={...th,textAlign:"right"};
 const thC={...th,textAlign:"center"};
-const td={padding:"10px 6px",color:C.text};
+const td={padding:"11px 6px",color:C.text};
 const tdR={...td,textAlign:"right"};
 const tdC={...td,textAlign:"center"};
-
-
-// ═══ PAYWALL · INSPECTOR (Request Pricing) ════════════════════════════════════
-const TRIAL_DAYS=7;
-const CONTACT_WA="https://wa.me/91XXXXXXXXXX?text=Hi%2C%20I%20want%20Inspector%20pricing%20for%20my%20mill";
-const CONTACT_EMAIL="mailto:hello@lexconv.com?subject=Inspector%20Pricing%20Request";
-const UNLOCK_CODES=["INSP-MILL-4201","INSP-MILL-7839","INSP-MILL-5162","INSP-MILL-9407","INSP-MILL-3578","INSP-MILL-8924","INSP-MILL-1635","INSP-MILL-6082","INSP-MILL-4793","INSP-MILL-2856"];
-
-function usePaywall(){
-const[state,setState]=useState({locked:false,daysLeft:TRIAL_DAYS,unlocked:false});
-useEffect(()=>{
-try{
-const code=localStorage.getItem("insp_unlock");
-if(code&&UNLOCK_CODES.includes(code)){setState({locked:false,daysLeft:0,unlocked:true});return}
-let start=localStorage.getItem("insp_trial_start");
-if(!start){start=Date.now().toString();localStorage.setItem("insp_trial_start",start)}
-const elapsed=(Date.now()-Number(start))/(1000*60*60*24);
-const left=Math.max(0,Math.ceil(TRIAL_DAYS-elapsed));
-setState({locked:elapsed>=TRIAL_DAYS,daysLeft:left,unlocked:false});
-}catch(e){setState({locked:false,daysLeft:TRIAL_DAYS,unlocked:false})}
-},[]);
-const tryUnlock=(code)=>{
-const c=code.trim().toUpperCase();
-if(UNLOCK_CODES.includes(c)){try{localStorage.setItem("insp_unlock",c)}catch(e){}setState({locked:false,daysLeft:0,unlocked:true});return true}
-return false};
-return{...state,tryUnlock}}
-
-function Paywall({tryUnlock}){
-const[code,setCode]=useState("");
-const[err,setErr]=useState(false);
-const submit=()=>{if(!tryUnlock(code)){setErr(true);setTimeout(()=>setErr(false),2000)}};
-return(<div style={{position:"fixed",inset:0,zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,background:"rgba(2,6,10,0.6)",backdropFilter:"blur(14px)",WebkitBackdropFilter:"blur(14px)"}}>
-<div className="modal-in" style={{background:"#02060a",border:`1px solid ${C.cyan}`,boxShadow:glow(C.cyan,24),width:440,maxWidth:"100%",padding:"32px 24px",textAlign:"center"}}>
-<div style={{fontSize:18,fontWeight:800,letterSpacing:3,color:"#fff",textShadow:glow(C.cyan,8),marginBottom:6}}>INSPECTOR<span style={{color:C.cyan}}>·</span></div>
-<div style={{fontSize:9,color:C.label,letterSpacing:2,marginBottom:24}}>YOUR FREE TRIAL HAS ENDED</div>
-<div style={{background:C.bg3,border:`1px solid ${C.border2}`,padding:"20px 16px",marginBottom:20}}>
-<div style={{fontSize:13,fontWeight:700,color:"#fff",letterSpacing:1,marginBottom:8}}>ENTERPRISE COMPLIANCE PLANS</div>
-<div style={{fontSize:11,color:C.label,lineHeight:1.7}}>Pricing is customized to your mill capacity,<br/>number of units, and compliance scope.</div></div>
-<a href={CONTACT_WA} target="_blank" rel="noopener" style={{display:"block",background:C.cyan,color:"#000",fontWeight:800,fontSize:12,letterSpacing:1.5,padding:"14px 0",textDecoration:"none",marginBottom:10,boxShadow:glow(C.cyan,6)}}>REQUEST PRICING · WHATSAPP</a>
-<a href={CONTACT_EMAIL} style={{display:"block",background:"none",border:`1px solid ${C.cyanDim}`,color:C.cyan,fontWeight:700,fontSize:11,letterSpacing:1.5,padding:"12px 0",textDecoration:"none",marginBottom:24}}>REQUEST VIA EMAIL</a>
-<div style={{fontSize:10,color:C.dim,lineHeight:1.6,marginBottom:16}}>Already purchased? Enter your activation code:</div>
-<div style={{display:"flex",gap:8}}>
-<input value={code} onChange={e=>setCode(e.target.value)} placeholder="ACTIVATION CODE" style={{flex:1,background:C.bg3,border:`1px solid ${err?C.red:C.border2}`,color:"#fff",fontFamily:"inherit",fontSize:13,padding:"10px 12px",outline:"none",letterSpacing:1,textTransform:"uppercase"}}/>
-<button onClick={submit} style={{background:C.cyan,color:"#000",border:"none",fontFamily:"inherit",fontWeight:700,fontSize:11,letterSpacing:1,padding:"10px 18px",cursor:"pointer"}}>UNLOCK</button></div>
-{err&&<div style={{fontSize:10,color:C.red,marginTop:8}}>Invalid code. Check and try again.</div>}
-</div></div>)}
-
-function TrialBanner({daysLeft}){
-return(<div style={{background:"rgba(0,212,255,0.06)",borderBottom:`1px solid ${C.border}`,padding:"6px 12px",textAlign:"center",fontSize:10,letterSpacing:1,color:C.label}}>
-FREE TRIAL · <span style={{color:C.cyan,fontWeight:700}}>{daysLeft} DAY{daysLeft!==1?"S":""} LEFT</span> · <a href={CONTACT_WA} target="_blank" rel="noopener" style={{color:C.cyan,textDecoration:"underline"}}>REQUEST PRICING</a></div>)}
-
-function Paywall({onUnlock}){
-const[code,setCode]=useState("");
-const[err,setErr]=useState(false);
-const tryCode=()=>{const cc=code.trim().toUpperCase();
-if(CODES.includes(cc)||cc===GOD_CODE){localStorage.setItem("insp_pro","1");onUnlock()}
-else{setErr(true);setTimeout(()=>setErr(false),2000)}};
-return(<div style={{position:"fixed",inset:0,background:"rgba(2,6,10,0.6)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:2000,backdropFilter:"blur(2px)",padding:16,overflow:"auto"}}>
-<div className="modal-in" style={{background:"#000",border:`1px solid ${C.cyan}`,boxShadow:glow(C.cyan,24),width:440,maxWidth:"100%",textAlign:"center",padding:"36px 28px"}}>
-<div style={{fontSize:10,color:C.label,letterSpacing:3,marginBottom:8}}>YOUR {TRIAL_DAYS}-DAY TRIAL HAS ENDED</div>
-<div style={{fontSize:20,fontWeight:800,color:"#fff",letterSpacing:1,marginBottom:24}}>UNLOCK COMPLIANCE VAULT</div>
-<div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
-{[["SINGLE MILL","\u20B94,999","/year","1 mill \u00B7 full vault"],["MILL GROUP","\u20B949,999","/year","up to 15 mills"],["ENTERPRISE","\u20B92,00,000","/year","unlimited \u00B7 priority support"]].map((p,i)=>(
-<a key={i} href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi, I want Inspector "+p[0]+" plan ("+p[1]+p[2]+"). Please share payment details.")}`} target="_blank" style={{textDecoration:"none",background:C.bg3,border:`1px solid ${i===0?C.cyan:C.border2}`,padding:"14px",display:"block",position:"relative"}}>
-{i===0&&<div style={{position:"absolute",top:-9,right:12,background:C.cyan,color:"#000",fontSize:8,fontWeight:800,letterSpacing:1,padding:"2px 8px"}}>MOST POPULAR</div>}
-<div style={{fontSize:10,color:C.label,letterSpacing:2,marginBottom:4}}>{p[0]}</div>
-<div style={{fontSize:24,fontWeight:800,color:C.cyan,animation:"priceFlash 1.6s ease-in-out infinite"}}>{p[1]}<span style={{fontSize:11,color:C.label}}>{p[2]}</span></div>
-<div style={{fontSize:9,color:C.dim,letterSpacing:1,marginTop:4}}>{p[3].toUpperCase()}</div></a>))}</div>
-<div style={{fontSize:9,color:C.dim,letterSpacing:1,marginBottom:14,lineHeight:1.6}}>PAY VIA WHATSAPP \u00B7 UNLOCK CODE SENT IMMEDIATELY AFTER PAYMENT</div>
-<div style={{display:"flex",gap:8,marginBottom:8}}>
-<input placeholder="HAVE A CODE? ENTER IT" value={code} onChange={e=>setCode(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryCode()} style={{...input,textAlign:"center",letterSpacing:2,borderColor:err?C.red:C.border2}}/>
-<button onClick={tryCode} style={{...btnPrimary,whiteSpace:"nowrap"}}>UNLOCK</button></div>
-{err&&<div style={{fontSize:10,color:C.red}}>INVALID CODE \u2014 CHECK AND TRY AGAIN</div>}
-</div></div>)}
 
 function INSPECTOR(){
 const[active,setActive]=useState("dashboard");
 const[showE,setShowE]=useState(false);
-const[entries,setEntries]=useState(()=>{try{return JSON.parse(localStorage.getItem("insp_entries")||"[]")}catch(e){return[]}});
+const[showSecret,setShowSecret]=useState(false);
+const[mill,setMill]=useState("");
 const[pro,setPro]=useState(()=>localStorage.getItem("insp_pro")==="1");
+const[entries,setEntries]=useState(()=>{try{return JSON.parse(localStorage.getItem("insp_entries")||"[]")}catch(e){return[]}});
 const trialStart=useMemo(()=>{let s=localStorage.getItem("insp_start");if(!s){s=String(Date.now());localStorage.setItem("insp_start",s)}return Number(s)},[]);
 const daysUsed=Math.floor((Date.now()-trialStart)/(24*60*60*1000));
 const walled=!pro&&daysUsed>=TRIAL_DAYS;
-useEffect(()=>{localStorage.setItem("insp_entries",JSON.stringify(entries))},[entries]);
-const[mill,setMill]=useState("");
 const isMobile=useIsMobile();
-const pw=usePaywall();
+useEffect(()=>{localStorage.setItem("insp_entries",JSON.stringify(entries))},[entries]);
 const add=e=>setEntries(p=>[e,...p].sort((a,b)=>b.date.localeCompare(a.date)));
 const render=()=>{switch(active){
 case"dashboard":return<Dashboard entries={entries} onLog={()=>setShowE(true)}/>;
 case"log":return<DailyLog entries={entries} onLog={()=>setShowE(true)}/>;
-case"compliance":return<Compliance entries={entries} mill={mill}/>;
-case"config":return<Config mill={mill} setMill={setMill}/>;
+case"compliance":return<Compliance entries={entries}/>;
+case"config":return<Config mill={mill} setMill={setMill} pro={pro}/>;
 default:return<Dashboard entries={entries} onLog={()=>setShowE(true)}/>}};
-const NavBtn=({m})=>(<button onClick={()=>setActive(m.id)} style={{display:"flex",alignItems:"center",gap:8,padding:isMobile?"8px 14px":"11px 16px",width:isMobile?"auto":"100%",background:active===m.id?C.bg2:"transparent",border:"none",borderLeft:isMobile?"none":(active===m.id?`2px solid ${C.cyan}`:"2px solid transparent"),borderBottom:isMobile?(active===m.id?`2px solid ${C.cyan}`:"2px solid transparent"):"none",color:active===m.id?C.cyan:C.label,fontFamily:"inherit",fontSize:11,letterSpacing:1,cursor:"pointer",textAlign:"left",whiteSpace:"nowrap",textShadow:active===m.id?glow(C.cyan,4):"none"}}><span style={{fontSize:13}}>{m.icon}</span>{m.label}</button>);
+const NavBtn=({m})=>(<button onClick={()=>setActive(m.id)} style={{display:"flex",alignItems:"center",padding:isMobile?"9px 15px":"11px 18px",width:isMobile?"auto":"100%",background:"transparent",border:"none",borderLeft:isMobile?"none":(active===m.id?`1px solid ${C.steel}`:"1px solid transparent"),borderBottom:isMobile?(active===m.id?`1px solid ${C.steel}`:"1px solid transparent"):"none",color:active===m.id?C.steel:C.label,fontFamily:"inherit",fontSize:10,letterSpacing:2,cursor:"pointer",textAlign:"left",whiteSpace:"nowrap"}}>{m.label}</button>);
 return(<div style={{background:C.bg,color:C.text,minHeight:"100vh",fontSize:12}}>
-<StatusBar mill={mill}/>
+<StatusBar pro={pro} onSecret={()=>setShowSecret(true)}/>
 <Ticker/>
-
-{isMobile&&<div style={{display:"flex",overflowX:"auto",background:"#000",borderBottom:`1px solid ${C.border}`,WebkitOverflowScrolling:"touch"}}>{MODULES.map(m=><NavBtn key={m.id} m={m}/>)}</div>}
-<div style={{display:"flex",minHeight:"calc(100vh - 70px)"}}>
-{!isMobile&&<div style={{width:180,background:"#000",borderRight:`1px solid ${C.border}`,padding:"12px 0",flexShrink:0}}>
+{isMobile&&<div style={{display:"flex",overflowX:"auto",background:"#070709",borderBottom:`1px solid ${C.border}`,WebkitOverflowScrolling:"touch"}}>{MODULES.map(m=><NavBtn key={m.id} m={m}/>)}</div>}
+<div style={{display:"flex",minHeight:"calc(100vh - 72px)"}}>
+{!isMobile&&<div style={{width:176,background:"#070709",borderRight:`1px solid ${C.border}`,padding:"14px 0",flexShrink:0}}>
 {MODULES.map(m=><NavBtn key={m.id} m={m}/>)}
-<div style={{padding:"16px",marginTop:20,borderTop:`1px solid ${C.border}`}}>
-<div style={{fontSize:9,color:C.dim,letterSpacing:1,marginBottom:6}}>COMPLIANCE VAULT</div>
-<div style={{fontSize:13,color:C.cyan,fontWeight:700,textShadow:glow(C.cyan,4)}}>{pro?"PRO ACTIVE":"FROM \u20B94,999/yr"}</div>
-<div style={{fontSize:9,color:pro?C.green:C.yellow,marginTop:4}}>{pro?"\u25CF Unlimited":`\u25CF Trial: ${Math.max(0,TRIAL_DAYS-daysUsed)} days left`}</div></div></div>}
-<div style={{flex:1,padding:12,overflow:"hidden",minWidth:0}} className={walled?"blurred":""}>
-<div style={{marginBottom:14}}>
-<h1 style={{fontSize:20,fontWeight:800,letterSpacing:1,color:"#fff",textShadow:glow(C.cyan,4)}}>{active==="dashboard"?"Inspector Shield":MODULES.find(m=>m.id===active).label}</h1>
-<div style={{fontSize:11,color:C.label,marginTop:4}}>Industrial Mill Compliance Vault · SPCB Monitoring</div></div>
+<div style={{padding:"18px",marginTop:24,borderTop:`1px solid ${C.border}`}}>
+<div style={{fontSize:8,color:C.dim,letterSpacing:2,marginBottom:8}}>MEMBERSHIP</div>
+<div style={{fontSize:11,color:C.steel,letterSpacing:1.5}}>{pro?"PRO":"EVALUATION"}</div>
+<div style={{fontSize:8,color:C.label,marginTop:5,letterSpacing:.5}}>{pro?"Unlimited access":`${Math.max(0,TRIAL_DAYS-daysUsed)} days remaining`}</div></div></div>}
+<div style={{flex:1,padding:14,overflow:"hidden",minWidth:0}} className={walled?"blurred":""}>
+<div style={{marginBottom:16}}>
+<h1 style={{fontSize:16,fontWeight:600,letterSpacing:2,color:C.white}}>{active==="dashboard"?"Inspector Shield":MODULES.find(m=>m.id===active).label}</h1>
+<div style={{fontSize:9,color:C.label,marginTop:5,letterSpacing:1}}>INDUSTRIAL MILL COMPLIANCE VAULT \u00B7 SPCB MONITORING</div></div>
 {render()}</div></div>
 {walled&&<Paywall onUnlock={()=>setPro(true)}/>}
+{showSecret&&<SecretEntry onClose={()=>setShowSecret(false)} onUnlock={()=>setPro(true)}/>}
 {showE&&!walled&&<EntryModal onClose={()=>setShowE(false)} onSave={add} isMobile={isMobile}/>}</div>)}
 
 ReactDOM.createRoot(document.getElementById("root")).render(<INSPECTOR/>);
 </script>
-
-<style>
-#pw-overlay{display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.9);backdrop-filter:blur(4px);align-items:center;justify-content:center}
-#pw-overlay.active{display:flex}
-#root.pw-blur{filter:blur(10px);pointer-events:none;user-select:none;transition:filter .4s}
-@keyframes priceFlash{0%,100%{transform:scale(1);text-shadow:0 0 20px #00D4FF,0 0 40px rgba(0,212,255,.5)}50%{transform:scale(1.07);text-shadow:0 0 30px #00D4FF,0 0 70px rgba(0,212,255,.9)}}
-@keyframes bPulse{0%,100%{border-color:#1d3a4d}50%{border-color:#00D4FF}}
-.pw-card{background:#07131c;border:1px solid #1d3a4d;padding:40px 28px;max-width:420px;width:95vw;text-align:center;animation:bPulse 2s ease-in-out infinite}
-.pw-logo{font-family:"IBM Plex Mono",monospace;font-size:20px;font-weight:800;letter-spacing:3px;color:#fff;margin-bottom:6px}
-.pw-tagline{font-family:"IBM Plex Mono",monospace;font-size:9px;color:#5a8499;letter-spacing:2px;margin-bottom:28px}
-.pw-msg{font-family:"IBM Plex Mono",monospace;font-size:11px;color:#3a5a6b;letter-spacing:1px;margin-bottom:28px;line-height:1.8}
-.pw-price-box{border:1px solid #00D4FF33;padding:28px;margin-bottom:24px;position:relative}
-.pw-price-top{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:8px;background:#00D4FF;color:#000;font-weight:700;padding:2px 10px;white-space:nowrap;letter-spacing:1px}
-.pw-ol{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:2px;color:#5a8499;margin-bottom:10px}
-.pw-price{font-family:"IBM Plex Mono",monospace;font-size:42px;font-weight:700;color:#fff;animation:priceFlash 1.4s ease-in-out infinite;line-height:1}
-.pw-per{font-family:"IBM Plex Mono",monospace;font-size:10px;color:#3a5a6b;margin-top:4px}
-.pw-sub-price{font-family:"IBM Plex Mono",monospace;font-size:10px;color:#5a8499;margin-top:8px}
-.pw-btn{width:100%;background:#00D4FF;color:#000;border:none;font-family:"IBM Plex Mono",monospace;font-weight:800;font-size:13px;letter-spacing:2px;padding:16px;cursor:pointer;box-shadow:0 0 24px rgba(0,212,255,.35);transition:all .2s}
-.pw-btn:hover{background:#fff}
-.pw-note{font-family:"IBM Plex Mono",monospace;font-size:9px;color:#222;margin-top:14px;letter-spacing:1px}
-</style>
-<div id="pw-overlay">
-  <div class="pw-card">
-    <div class="pw-logo">INSPECTOR<span style="color:#00D4FF">·</span></div>
-    <div class="pw-tagline">MILL COMPLIANCE VAULT · LEXCONV</div>
-    <div class="pw-msg">YOUR 14-DAY FREE TRIAL HAS ENDED<br>ACTIVATE TO CONTINUE LOGGING</div>
-    <div class="pw-price-box">
-      <div class="pw-price-top">ANNUAL PLAN · SPCB READY</div>
-      <div class="pw-ol">ANNUAL</div>
-      <div class="pw-price">₹4,999</div>
-      <div class="pw-per">/year</div>
-      <div class="pw-sub-price">Less than ₹14 per day</div>
-    </div>
-    <button class="pw-btn" onclick="pwPay()">▼ ACTIVATE NOW — INSTANT UNLOCK</button>
-    <div class="pw-note">SECURE PAYMENT · RAZORPAY · ALL YOUR DATA SAFE</div>
-  </div>
-</div>
-<script>
-(function(){
-  const K="inspector",T=14*86400000;
-  function unlock(){document.getElementById("root").classList.remove("pw-blur");document.getElementById("pw-overlay").classList.remove("active");localStorage.setItem(K+"_paid","1")};
-  window.pwPay=function(){
-    const s=document.createElement("script");s.src="https://checkout.razorpay.com/v1/checkout.js";
-    s.onload=function(){new window.Razorpay({key:"YOUR_RAZORPAY_KEY_ID",amount:499900,currency:"INR",name:"INSPECTOR · LexConv",description:"Inspector Annual ₹4,999/yr",theme:{color:"#00D4FF"},handler:function(r){unlock()}}).open()};
-    document.body.appendChild(s)
-  };
-  if(localStorage.getItem(K+"_paid")==="1")return;
-  let s=localStorage.getItem(K+"_s");
-  if(!s){localStorage.setItem(K+"_s",String(Date.now()));return}
-  if(Date.now()-Number(s)>T){document.getElementById("root").classList.add("pw-blur");document.getElementById("pw-overlay").classList.add("active")}
-})();
-</script>
 </body>
 </html>
+
 
 
